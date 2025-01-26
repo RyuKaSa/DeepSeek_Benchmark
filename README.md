@@ -11,8 +11,7 @@ Each project consists of:
 The repository follows a structured **naming scheme**:
 - `main-o1.py` → ChatGPT O1’s implementation
 - `main-R1.py` → DeepSeek R1’s implementation
-- `combined.py` → The final hybrid version, incorporating both LLMs' best aspects and manual improvements
-
+- `combined.py` → The final hybrid version, incorporating both LLMs' code's best aspects and incorporates additional human-lead optimizations, with about an additional hour.
 ---
 
 ## Projects
