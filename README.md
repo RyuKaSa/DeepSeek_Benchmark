@@ -1,4 +1,4 @@
-# LLM Coding Benchmark: DeepSeek R1 vs ChatGPT O1
+# LLM Coding Benchmark: DeepSeek R1 vs ChatGPT o1
 
 ## Overview
 This repository serves as a testing ground for evaluating the coding capabilities of two competing Large Language Models (LLMs): **DeepSeek R1** and **ChatGPT o1**. The goal is to implement technically complex programming challenges, focusing on areas such as physics simulations, AI-driven algorithms, and computational modeling.
@@ -66,7 +66,7 @@ Implementation Requirements:
 
 The third result *combines* both, along with improved particle-to-particle interactions, mostly using pressure stiffness, which prevents the balls from touching their neighbors directly, reflecting real physics models more accurately.
 
-In this mini-project, **o1** was easier to work with, as **R1** tended to get stuck in its *inner monologue/reasoning* loop. However, the combined result was mostly based on **R1**'s output.
+In this mini-project, **o1** was easier to work with, as **R1** tended to get stuck in its *inner monologue/reasoning* loop. However, the *combined* result was mostly based on **R1**'s output.
 
 ---
 
