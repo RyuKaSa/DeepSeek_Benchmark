@@ -47,10 +47,26 @@ Implementation Requirements:
 - Ensure particles remain strictly within the window boundaries, adjusting dynamically if the window is resized.
 ```
 
-#### Evaluation Process
-- Both LLMs are allowed **up to 5 iterative refinements** to improve parameters, ensure consistency in **particle size, gravity, and behavior**, and refine the simulation.
-- Once finalized, their scripts are compared for performance, realism, and adherence to the problem constraints.
-- The **hybrid script (`combined.py`)** merges the best aspects from both implementations and incorporates additional human-lead optimizations.
+---
+
+#### Results
+
+##### o1:
+![o1](fluid_simulation/images/o1.gif)
+
+##### R1:
+![R1](fluid_simulation/images/R1.gif)
+
+##### combined:
+![combined](fluid_simulation/images/combined.gif)
+
+#### Commentary
+
+**o1** had better particle-to-particle interactions, but **R1** had better window-resizing handling.
+
+The third result *combines* both, along with improved particle-to-particle interactions, mostly using pressure stiffness, which prevents the balls from touching their neighbors directly, reflecting real physics models more accurately.
+
+In this mini-project, **o1** was easier to work with, as **R1** tended to get stuck in its *inner monologue/reasoning* loop. However, the combined result was mostly based on **R1**'s output.
 
 ---
 
