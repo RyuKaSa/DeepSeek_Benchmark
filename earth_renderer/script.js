@@ -1,13 +1,23 @@
-// script.js
 let renderer, camera, scene, sphere;
-let isBound = false;
-let moveX = 0, moveY = 0;
-const sensitivity = 0.002;
+const planets = {};
 
 // Performance tracking variables
 let lastTime = 0;
 let accumulatedTime = 0;
 let frameCount = 0;
+
+// Planet configurations
+const planetsConfig = [
+    { texture: 'assets/sun/sun.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 0, speed: 2293200 },
+    { texture: 'assets/mercury/mercury.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 0.1, speed: 5068800 },
+    { texture: 'assets/venus/surface.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 177, speed: 21088800 },
+    { texture: 'assets/earth/earth.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 23, speed: 86160 },
+    { texture: 'assets/mars/mars.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 25, speed: 88560 },
+    { texture: 'assets/jupiter/jupiter.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 3, speed: 35700 },
+    { texture: 'assets/saturn/saturn.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 27, speed: 37980 },
+    { texture: 'assets/uranus/uranus.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 98, speed: 62040 },
+    { texture: 'assets/neptune/neptune.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 30, speed: 57600 }
+];
 
 function init() {
     // Setup renderer
@@ -17,7 +27,7 @@ function init() {
 
     // Setup camera
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 0.1);
+    camera.position.set(0, 0, 5);
 
     // Setup scene
     scene = new THREE.Scene();
@@ -31,8 +41,9 @@ function init() {
         left: '10px',
         color: 'white',
         fontFamily: 'Arial',
+        fontSize: '16px',
         zIndex: '1000',
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(1,0,0,1)',
         padding: '5px'
     });
     document.body.appendChild(perfDiv);
@@ -40,40 +51,46 @@ function init() {
     // Create skybox sphere
     const geometry = new THREE.SphereGeometry(500, 60, 60);
     const texture = new THREE.TextureLoader().load('assets/skybox.png');
-    const material = new THREE.MeshBasicMaterial({
-        map: texture,
-        side: THREE.BackSide
-    });
+    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide });
     sphere = new THREE.Mesh(geometry, material);
     scene.add(sphere);
 
-    // Event listeners
-    document.addEventListener('mousemove', onMouseMove);
-    document.getElementById('bind-button').addEventListener('click', togglePointerLock);
-    document.addEventListener('pointerlockchange', onPointerLockChange);
+    // Create planets
+    planetsConfig.forEach((config) => {
+        const texture = new THREE.TextureLoader().load(config.texture);
+        const planetMaterial = new THREE.MeshBasicMaterial({ map: texture });
+        const planetGeometry = new THREE.SphereGeometry(config.size, 32, 32);
+        const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+        planet.position.set(config.position.x, config.position.y, config.position.z);
+        planet.visible = false;
+        scene.add(planet);
+        
+        const name = config.texture.split('/')[1];
+        planets[name] = planet;
+    });
+
+    const guiContainer = document.getElementById('gui-container');
+
+    planetsConfig.forEach((config) => {
+        const name = config.texture.split('/')[1];
+        const button = document.createElement('button');
+        button.className = 'gui-button';
+        button.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        button.addEventListener('click', () => showPlanet(name));
+        guiContainer.appendChild(button);
+    });
+
     window.addEventListener('resize', onWindowResize);
 }
 
-function togglePointerLock() {
-    if (document.pointerLockElement) {
-        document.exitPointerLock();
+function showPlanet(name) {
+    Object.values(planets).forEach(planet => planet.visible = false);
+    if (planets[name]) {
+        planets[name].visible = true;
+        console.log(`${name} is now visible`);
     } else {
-        renderer.domElement.requestPointerLock();
+        console.error(`Planet ${name} not found!`);
     }
-}
-
-function onPointerLockChange() {
-    isBound = document.pointerLockElement === renderer.domElement;
-    document.getElementById('bind-button').style.display = isBound ? 'none' : 'block';
-}
-
-function onMouseMove(e) {
-    if (!isBound) return;
-    
-    moveX += -e.movementX * sensitivity;
-    moveY += e.movementY * sensitivity;
-    
-    moveY = Math.max(-Math.PI/2, Math.min(Math.PI/2, moveY));
 }
 
 function onWindowResize() {
@@ -97,10 +114,17 @@ function animate(timestamp) {
         return;
     }
 
-    const deltaTime = timestamp - lastTime;
+let deltaTime = timestamp - lastTime;
     lastTime = timestamp;
 
-    accumulatedTime += deltaTime;
+    // Ensure accumulatedTime is always a valid number
+    if (isNaN(accumulatedTime) || accumulatedTime === undefined) {
+        console.error("accumulatedTime was NaN or undefined! Resetting.");
+        accumulatedTime = 0;
+    }
+
+    accumulatedTime += deltaTime; // Safe update
+
     frameCount++;
 
     if (accumulatedTime >= 500) {
@@ -109,10 +133,6 @@ function animate(timestamp) {
         updatePerformanceDisplay(averageDelta, averageFPS);
         accumulatedTime = 0;
         frameCount = 0;
-    }
-
-    if (isBound) {
-        camera.rotation.set(-moveY, moveX, 0, 'YXZ');
     }
 
     renderer.render(scene, camera);

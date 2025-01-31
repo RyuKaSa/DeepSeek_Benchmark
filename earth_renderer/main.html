@@ -2,21 +2,62 @@
 <html>
 <head>
     <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
-        #bind-button {
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+        }
+        canvas { 
+            display: block; 
+        }
+
+        /* Ensure the GUI container is centered at the bottom */
+        #gui-container {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            cursor: pointer;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
             padding: 10px;
-            z-index: 100;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Style buttons for better visibility */
+        .gui-button {
+            padding: 10px 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.8); /* Increased opacity for better visibility */
+            color: black; /* Changed text color to black for contrast */
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .gui-button:hover {
+            background: rgba(255, 255, 255, 1); /* Less transparency on hover */
+            transform: translateY(-2px);
+        }
+
+        /* Style for performance display */
+        #performance {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <button id="bind-button">Click to Enable Mouse Control</button>
+    <div id="gui-container"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="script.js"></script>
 </body>
