@@ -6,6 +6,9 @@ let lastTime = 0;
 let accumulatedTime = 0;
 let frameCount = 0;
 
+// Rotation speed coefficient
+const rotationScale = 1000;
+
 // Planet configurations
 const planetsConfig = [
     { texture: 'assets/sun/sun.png', size: 2, position: { x: 0, y: 0, z: 0 }, initial_axis: 0, speed: 2293200 },
@@ -63,7 +66,18 @@ function init() {
     // Create planets
     planetsConfig.forEach((config) => {
         const texture = new THREE.TextureLoader().load(config.texture);
-        const planetMaterial = new THREE.MeshStandardMaterial({ map: texture });
+        let planetMaterial;
+
+        // Determine if the current planet is the Sun
+        const name = config.texture.split('/')[1].toLowerCase(); // e.g., 'sun'
+
+        if (name === 'sun') {
+            planetMaterial = new THREE.MeshBasicMaterial({ map: texture });
+        } else {
+            // For other planets, use MeshStandardMaterial
+            planetMaterial = new THREE.MeshStandardMaterial({ map: texture });
+        }
+
         const planetGeometry = new THREE.SphereGeometry(config.size, 32, 32);
         const planet = new THREE.Mesh(planetGeometry, planetMaterial);
         planet.position.set(config.position.x, config.position.y, config.position.z);
@@ -72,12 +86,12 @@ function init() {
         // Apply axial tilt (initial_axis) by rotating around the x-axis
         planet.rotation.x = THREE.MathUtils.degToRad(config.initial_axis);
 
-        // Convert speed from degrees per second to radians per millisecond
-        planet.rotationSpeed = THREE.MathUtils.degToRad(config.speed) / 1000;
+        // Calculate rotation speed based on spin period (speed in seconds per full rotation)
+        // Angular speed (radians per millisecond) = (2 * PI) / (speed * 1000) * rotationScale
+        planet.rotationSpeed = (2 * Math.PI) / (config.speed * 1000) * rotationScale;
 
         scene.add(planet);
         
-        const name = config.texture.split('/')[1];
         planets[name] = planet;
     });
 
