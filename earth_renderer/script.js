@@ -32,6 +32,11 @@ function init() {
     // Setup scene
     scene = new THREE.Scene();
 
+    // Add Directional Light (simulating the sun)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 0, 5); // Position it as needed
+    scene.add(directionalLight);
+
     // Create performance display
     const perfDiv = document.createElement('div');
     perfDiv.id = 'performance';
@@ -58,11 +63,18 @@ function init() {
     // Create planets
     planetsConfig.forEach((config) => {
         const texture = new THREE.TextureLoader().load(config.texture);
-        const planetMaterial = new THREE.MeshBasicMaterial({ map: texture });
+        const planetMaterial = new THREE.MeshStandardMaterial({ map: texture });
         const planetGeometry = new THREE.SphereGeometry(config.size, 32, 32);
         const planet = new THREE.Mesh(planetGeometry, planetMaterial);
         planet.position.set(config.position.x, config.position.y, config.position.z);
         planet.visible = false;
+
+        // Apply axial tilt (initial_axis) by rotating around the x-axis
+        planet.rotation.x = THREE.MathUtils.degToRad(config.initial_axis);
+
+        // Convert speed from degrees per second to radians per millisecond
+        planet.rotationSpeed = THREE.MathUtils.degToRad(config.speed) / 1000;
+
         scene.add(planet);
         
         const name = config.texture.split('/')[1];
@@ -114,7 +126,7 @@ function animate(timestamp) {
         return;
     }
 
-let deltaTime = timestamp - lastTime;
+    let deltaTime = timestamp - lastTime;
     lastTime = timestamp;
 
     // Ensure accumulatedTime is always a valid number
@@ -134,6 +146,13 @@ let deltaTime = timestamp - lastTime;
         accumulatedTime = 0;
         frameCount = 0;
     }
+
+    // Rotate visible planets based on their rotationSpeed
+    Object.values(planets).forEach(planet => {
+        if (planet.visible) {
+            planet.rotation.y += planet.rotationSpeed * deltaTime;
+        }
+    });
 
     renderer.render(scene, camera);
 }
